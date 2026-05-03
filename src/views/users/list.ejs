@@ -1,0 +1,17 @@
+<h1 class="text-2xl font-bold mb-4">Users</h1>
+
+<table border="1" class="w-full">
+  <tr>
+    <th>ID</th>
+    <th>Username</th>
+    <th>Role</th>
+  </tr>
+
+  <% users.forEach(user => { %>
+    <tr>
+      <td><%= user.id %></td>
+      <td><%= user.username %></td>
+      <td><%= user.role_name %></td>
+    </tr>
+  <% }) %>
+</table>
