@@ -8,8 +8,10 @@ export interface Permission extends RowDataPacket {
   action: string;
 }
 
-export const getAllPermissions = async () => {
-  const [rows] = await pool.query<Permission[]>("SELECT * FROM permissions");
+export const getAllPermissions = async (): Promise<Permission[]> => {
+  const [rows] = await pool.query<Permission[]>(
+    "SELECT * FROM permissions"
+  );
   return rows;
 };
 
@@ -18,7 +20,7 @@ export const createPermission = async (
   resource: string,
   action: string
 ) => {
-  return await pool.query(
+  return await pool.query<ResultSetHeader>(
     "INSERT INTO permissions (name, resource, action) VALUES (?, ?, ?)",
     [name, resource, action]
   );

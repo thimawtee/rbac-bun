@@ -11,38 +11,35 @@ import {
 // =====================
 export const listUsers = async (req: any, res: Response) => {
   const users = await getAllUsers();
-  const user = req.session.user;
 
   res.render("layouts/main", {
     title: "Users",
-    user,
+    user: req.session.user,
 
     body: `
       <div class="flex justify-between items-center mb-4">
-
         <h1 class="text-2xl font-bold">Users</h1>
 
         ${
-          user && (user.role_id === 1 || user.role_id === 2)
+          req.session.user.role_id !== 3
             ? `
-              <a href="/users/create"
-                 class="bg-blue-600 text-white px-4 py-2 rounded">
-                + Add User
-              </a>
-            `
+          <a href="/users/create"
+             class="bg-blue-600 text-white px-4 py-2 rounded">
+            + Add User
+          </a>
+        `
             : ""
         }
-
       </div>
 
       <div class="bg-white shadow rounded p-4">
-
-        <table class="w-full text-left border-collapse">
+        <table class="w-full text-left">
           <thead>
             <tr class="border-b">
               <th class="p-2">ID</th>
               <th class="p-2">Username</th>
               <th class="p-2">Role</th>
+              <th class="p-2">Action</th>
             </tr>
           </thead>
 
@@ -50,18 +47,31 @@ export const listUsers = async (req: any, res: Response) => {
             ${users
               .map(
                 (u: any) => `
-                  <tr class="border-b">
-                    <td class="p-2">${u.id}</td>
-                    <td class="p-2">${u.username}</td>
-                    <td class="p-2">${u.role_name}</td>
-                  </tr>
-                `
+              <tr class="border-b">
+                <td class="p-2">${u.id}</td>
+                <td class="p-2">${u.username}</td>
+                <td class="p-2">${u.role_name}</td>
+
+                <td class="p-2">
+                  ${
+                    req.session.user.role_id !== 3
+                      ? `
+                    <form method="POST" action="/users/${u.id}?_method=DELETE" onsubmit="return confirm('Yakin hapus user ini?')">
+                      <button class="bg-red-600 text-white px-3 py-1 rounded">
+                        Delete
+                      </button>
+                    </form>
+                  `
+                      : "-"
+                  }
+                </td>
+
+              </tr>
+            `
               )
               .join("")}
           </tbody>
-
         </table>
-
       </div>
     `
   });
@@ -70,19 +80,17 @@ export const listUsers = async (req: any, res: Response) => {
 // =====================
 // CREATE PAGE
 // =====================
-export const createPage = async (req: any, res: Response) => {
+export const createPage = async (req: any, res: any) => {
   const roles = await getAllRoles();
-  const user = req.session.user;
 
   res.render("layouts/main", {
     title: "Create User",
-    user,
+    user: req.session.user,
 
     body: `
       <h1 class="text-2xl font-bold mb-4">Create User</h1>
 
-      <form method="POST" action="/users"
-            class="space-y-3 bg-white p-4 rounded shadow">
+      <form method="POST" action="/users" class="space-y-3 bg-white p-4 rounded shadow">
 
         <input name="username"
                placeholder="Username"
@@ -99,11 +107,10 @@ export const createPage = async (req: any, res: Response) => {
           ${roles
             .map(
               (r: any) => `
-                <option value="${r.id}">${r.name}</option>
-              `
+              <option value="${r.id}">${r.name}</option>
+            `
             )
             .join("")}
-
         </select>
 
         <button class="bg-green-600 text-white px-4 py-2 rounded">
@@ -125,13 +132,13 @@ export const storeUser = async (req: Request, res: Response) => {
     return res.send("Semua field wajib diisi");
   }
 
-  const roleId = Number(role_id);
+  const roleIdNumber = Number(role_id);
 
-  if (isNaN(roleId)) {
+  if (isNaN(roleIdNumber)) {
     return res.send("Role tidak valid");
   }
 
-  await createUser(username, password, roleId);
+  await createUser(username, password, roleIdNumber);
 
   res.redirect("/users");
 };
@@ -141,10 +148,6 @@ export const storeUser = async (req: Request, res: Response) => {
 // =====================
 export const removeUser = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-
-  if (isNaN(id)) {
-    return res.send("ID tidak valid");
-  }
 
   await deleteUser(id);
 

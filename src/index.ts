@@ -10,47 +10,42 @@ import authRoutes from "./routers/authRoutes";
 
 const app = express();
 
-// =====================
-// 1. BODY PARSER (WAJIB DI ATAS ROUTES)
-// =====================
+// BODY PARSER
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// =====================
-// 2. SESSION
-// =====================
+// SESSION
 app.use(
   session({
     secret: "rbac-secret",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: false
   })
 );
 
-// =====================
-// 3. VIEW ENGINE
-// =====================
+// 🔥 WAJIB: SYNC SESSION → REQ.USER
+app.use((req: any, res, next) => {
+  if (req.session.user) {
+    req.user = req.session.user;
+  }
+  next();
+});
+
+// VIEW
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// =====================
-// 4. ROUTES
-// =====================
+// ROUTES
 app.use(authRoutes);
 app.use("/users", userRoutes);
 app.use("/roles", roleRoutes);
 app.use("/permissions", permissionRoutes);
 
-// =====================
-// 5. HOME
-// =====================
+// HOME
 app.get("/", (req, res) => {
   res.send("RBAC System Running 🚀");
 });
 
-// =====================
-// 6. START SERVER
-// =====================
 app.listen(process.env.PORT, () => {
-  console.log(`Server running http://localhost:${process.env.PORT}`);
+  console.log(`http://localhost:${process.env.PORT}`);
 });
