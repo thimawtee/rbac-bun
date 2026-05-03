@@ -13,6 +13,17 @@ export const getAllPermissions = async () => {
   return rows;
 };
 
+export const createPermission = async (
+  name: string,
+  resource: string,
+  action: string
+) => {
+  return await pool.query(
+    "INSERT INTO permissions (name, resource, action) VALUES (?, ?, ?)",
+    [name, resource, action]
+  );
+};
+
 export const assignPermissionToRole = async (roleId: number, permissionId: number) => {
   const [result] = await pool.query<ResultSetHeader>(
     "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)",

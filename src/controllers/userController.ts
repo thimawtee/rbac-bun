@@ -1,34 +1,152 @@
 import type { Request, Response } from "express";
-import pool from "../config/database";
+import { getAllRoles } from "../models/roleModel";
+import {
+  getAllUsers,
+  createUser,
+  deleteUser
+} from "../models/userModel";
 
+// =====================
 // LIST USERS
-export const listUsers = async (req: Request, res: Response) => {
-  const [users] = await pool.query(`
-    SELECT users.id, username, role_id, roles.name as role_name
-    FROM users
-    JOIN roles ON users.role_id = roles.id
-  `);
+// =====================
+export const listUsers = async (req: any, res: Response) => {
+  const users = await getAllUsers();
+  const user = req.session.user;
 
-  res.render("users/list", { users });
+  res.render("layouts/main", {
+    title: "Users",
+    user,
+
+    body: `
+      <div class="flex justify-between items-center mb-4">
+
+        <h1 class="text-2xl font-bold">Users</h1>
+
+        ${
+          user && (user.role_id === 1 || user.role_id === 2)
+            ? `
+              <a href="/users/create"
+                 class="bg-blue-600 text-white px-4 py-2 rounded">
+                + Add User
+              </a>
+            `
+            : ""
+        }
+
+      </div>
+
+      <div class="bg-white shadow rounded p-4">
+
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b">
+              <th class="p-2">ID</th>
+              <th class="p-2">Username</th>
+              <th class="p-2">Role</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${users
+              .map(
+                (u: any) => `
+                  <tr class="border-b">
+                    <td class="p-2">${u.id}</td>
+                    <td class="p-2">${u.username}</td>
+                    <td class="p-2">${u.role_name}</td>
+                  </tr>
+                `
+              )
+              .join("")}
+          </tbody>
+
+        </table>
+
+      </div>
+    `
+  });
 };
 
-// CREATE USER
+// =====================
+// CREATE PAGE
+// =====================
+export const createPage = async (req: any, res: Response) => {
+  const roles = await getAllRoles();
+  const user = req.session.user;
+
+  res.render("layouts/main", {
+    title: "Create User",
+    user,
+
+    body: `
+      <h1 class="text-2xl font-bold mb-4">Create User</h1>
+
+      <form method="POST" action="/users"
+            class="space-y-3 bg-white p-4 rounded shadow">
+
+        <input name="username"
+               placeholder="Username"
+               class="border p-2 w-full" />
+
+        <input name="password"
+               type="password"
+               placeholder="Password"
+               class="border p-2 w-full" />
+
+        <select name="role_id" class="border p-2 w-full">
+          <option value="">-- Pilih Role --</option>
+
+          ${roles
+            .map(
+              (r: any) => `
+                <option value="${r.id}">${r.name}</option>
+              `
+            )
+            .join("")}
+
+        </select>
+
+        <button class="bg-green-600 text-white px-4 py-2 rounded">
+          Save
+        </button>
+
+      </form>
+    `
+  });
+};
+
+// =====================
+// STORE USER
+// =====================
 export const storeUser = async (req: Request, res: Response) => {
   const { username, password, role_id } = req.body;
 
-  await pool.query(
-    "INSERT INTO users (username, password, role_id) VALUES (?, ?, ?)",
-    [username, password, role_id]
-  );
+  if (!username || !password || !role_id) {
+    return res.send("Semua field wajib diisi");
+  }
+
+  const roleId = Number(role_id);
+
+  if (isNaN(roleId)) {
+    return res.send("Role tidak valid");
+  }
+
+  await createUser(username, password, roleId);
 
   res.redirect("/users");
 };
 
+// =====================
 // DELETE USER
+// =====================
 export const removeUser = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = Number(req.params.id);
 
-  await pool.query("DELETE FROM users WHERE id = ?", [id]);
+  if (isNaN(id)) {
+    return res.send("ID tidak valid");
+  }
+
+  await deleteUser(id);
 
   res.redirect("/users");
 };

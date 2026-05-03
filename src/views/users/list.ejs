@@ -1,17 +1,25 @@
 <h1 class="text-2xl font-bold mb-4">Users</h1>
 
-<table border="1" class="w-full">
-  <tr>
-    <th>ID</th>
-    <th>Username</th>
-    <th>Role</th>
+<!-- 🔥 ROLE-BASED BUTTON -->
+<% if (user && (user.role_id === 1 || user.role_id === 2)) { %>
+  <a href="/users/create"
+     class="bg-green-500 text-white px-4 py-2 rounded inline-block mb-3">
+    + Add User
+  </a>
+<% } %>
+
+<table class="w-full mt-4 bg-white shadow rounded">
+  <tr class="bg-gray-200">
+    <th class="p-2">ID</th>
+    <th class="p-2">Username</th>
+    <th class="p-2">Role</th>
   </tr>
 
-  <% users.forEach(user => { %>
-    <tr>
-      <td><%= user.id %></td>
-      <td><%= user.username %></td>
-      <td><%= user.role_name %></td>
+  <% users.forEach(u => { %>
+    <tr class="border-t">
+      <td class="p-2"><%= u.id %></td>
+      <td class="p-2"><%= u.username %></td>
+      <td class="p-2"><%= u.role_name %></td>
     </tr>
   <% }) %>
 </table>

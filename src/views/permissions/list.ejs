@@ -1,0 +1,28 @@
+<% include ../layouts/header %>
+
+<h1 class="text-2xl font-bold mb-4">Permissions</h1>
+
+<a href="/permissions/create"
+   class="bg-green-500 text-white px-4 py-2 rounded">
+  + Add Permission
+</a>
+
+<table class="w-full mt-4 bg-white shadow">
+  <tr class="bg-gray-200">
+    <th>ID</th>
+    <th>Name</th>
+    <th>Resource</th>
+    <th>Action</th>
+  </tr>
+
+  <% permissions.forEach(p => { %>
+    <tr>
+      <td><%= p.id %></td>
+      <td><%= p.name %></td>
+      <td><%= p.resource %></td>
+      <td><%= p.action %></td>
+    </tr>
+  <% }) %>
+</table>
+
+<% include ../layouts/footer %>

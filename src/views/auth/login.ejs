@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+  <div class="bg-white p-8 rounded-xl shadow-md w-96">
+    <h1 class="text-2xl font-bold mb-6 text-center">RBAC Login</h1>
+
+    <form method="POST" action="/login" class="space-y-4">
+      <input name="username" placeholder="Username"
+        class="w-full p-2 border rounded" />
+
+      <button class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+        Login
+      </button>
+    </form>
+  </div>
+
+</body>
+</html>

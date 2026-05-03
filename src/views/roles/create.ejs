@@ -1,0 +1,17 @@
+<% include ../layouts/header %>
+
+<h1 class="text-2xl font-bold mb-4">Create Role</h1>
+
+<form method="POST" action="/roles" class="space-y-4">
+
+  <input name="name"
+    placeholder="Role name"
+    class="border p-2 w-full"/>
+
+  <button class="bg-blue-500 text-white px-4 py-2 rounded">
+    Save
+  </button>
+
+</form>
+
+<% include ../layouts/footer %>

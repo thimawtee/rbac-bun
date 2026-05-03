@@ -1,11 +1,18 @@
 import { Router } from "express";
-import { listUsers, storeUser, removeUser } from "../controllers/userController";
+import {
+  listUsers,
+  storeUser,
+  removeUser,
+  createPage
+} from "../controllers/userController";
 import { checkPermission } from "../middleware/rbacMiddleware";
 
 const router = Router();
 
 router.get("/", checkPermission("user:view"), listUsers);
+router.get("/create", checkPermission("user:create"), createPage);
 router.post("/", checkPermission("user:create"), storeUser);
 router.delete("/:id", checkPermission("user:delete"), removeUser);
 
+// 🔥 INI PENTING
 export default router;
